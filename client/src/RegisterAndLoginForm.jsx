@@ -1,6 +1,9 @@
-import { useContext, useState } from "react";
+import React,{ useContext, useState } from "react";
 import axios from "axios"; 
 import { UserContext } from "./userContext";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 export default function RegisterAndLoginForm(){
     const [username, setUserName] = useState('');
@@ -10,9 +13,18 @@ export default function RegisterAndLoginForm(){
     async function handleResponse(ev){
         ev.preventDefault();
         const url = isLoggedin === 'register' ? 'register' : 'login';
-        const{data} = await axios.post(url, {username, password});
-        setLoggedInUsername(username);
-        setId(data.id);
+        try{
+            const{data} = await axios.post(url, {username, password});
+            setLoggedInUsername(username);
+            setId(data.id);
+        } catch(error){
+            if(error.response && error.response.status === 401) {
+                toast.error("Incorrect Password :(");
+            }
+            else if(error.response && error.response.status === 404){
+                toast.error("No user found");
+            }
+        }
     }
     return(
         <div className="bg-pink-200 h-screen flex items-center">
@@ -52,6 +64,7 @@ export default function RegisterAndLoginForm(){
                         </div>
                     )}
                 </div>
+                <ToastContainer position="bottom-right" autoClose = {2500}/>
             </form>
         </div>
     );

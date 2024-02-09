@@ -2,16 +2,18 @@ import RegisterAndLoginForm from "./RegisterAndLoginForm";
 import { useContext } from "react";
 import { UserContext } from "./userContext";
 import Chat from "./ChatWindow";
+import Avatar from "./Avatar";
 
 export default function Routes() {
-    const { username, id } = useContext(UserContext);
+    const { username, id, avatar } = useContext(UserContext);
 
     if (username) {
-        // return <Chat />;
-        return "logged in! " + username;
+        return <Chat/>;
     }
 
-
+    // if(username && !avatar){
+    //     return <Avatar/>
+    // }
 
     return (
         <RegisterAndLoginForm />
