@@ -24,7 +24,7 @@ export function UserContextProvider({children}){
     }, []);
     
     return(
-        <UserContext.Provider value={{username, setUsername, id, setId, avatar, setAvatar   }}>
+        <UserContext.Provider value={{username, setUsername, id, setId, avatar, setAvatar}}>
             {children}
         </UserContext.Provider>
     );

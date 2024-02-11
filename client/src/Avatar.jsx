@@ -19,6 +19,7 @@ export default function AvatarSelection() {
 
     const handleConfirmAvatar = () => {
         setAvatar(selectedAvatar);
+        localStorage.setItem('avatar', selectedAvatar);
         axios.put('/profile', { avatar: selectedAvatar })
         .then(response => {
             console.log('Avatar updated successfully');
