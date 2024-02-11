@@ -7,7 +7,6 @@ export default function AvatarSelection() {
     const [avatars, setAvatars] = useState([]);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-    // Generate 4 random avatars when the component mounts
     useEffect(() => {
         const newAvatars = Array.from({length: 4}, () => Math.floor(Math.random() * 10000000).toString());
         setAvatars(newAvatars);
@@ -30,17 +29,27 @@ export default function AvatarSelection() {
     };
 
     return (
-        <div className="flex justify-around items-center flex-row h-screen w-screen">
+        <div className="flex flex-col items-center h-screen py-10 pb-10 bg-slate-300">
+            <div className="title-container flex justify-center mt-20 text-3xl">Select your avatar!</div>
+            <div className="flex gap-6 items-center h-screen flex-wrap">
             {avatars.map(avatar => (
                 <img 
                     key={avatar}
                     src={`https://api.multiavatar.com/${avatar}.svg`}
                     alt="Avatar"
                     onClick={() => handleAvatarClick(avatar)}
-                    className= {`cursor-pointer w-24 h-24 ${avatar === selectedAvatar ? 'border-2 border-blue-500' : ''}`}
+                    className= {`cursor-pointer w-24 h-24 transition duration-500 ease-in-out ${avatar === selectedAvatar ? 'border-2 border-slate-500' : ''}`}
                 />
             ))}
-            {selectedAvatar && <button onClick={handleConfirmAvatar}>Set as Avatar</button>}
+            </div>
+        <div>
+            {selectedAvatar && <button onClick={handleConfirmAvatar} 
+                className="bg-slate-500 hover:bg-slate-600 text-white font-bold rounded block p-3 py-3 mb-10 ">
+                    Set as Avatar
+                </button>}
         </div>
+        </div>
+
+
     );
 }

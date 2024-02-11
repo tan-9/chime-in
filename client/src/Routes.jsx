@@ -7,13 +7,16 @@ import Avatar from "./Avatar";
 export default function Routes() {
     const { username, id, avatar } = useContext(UserContext);
 
-    if (username) {
-        return <Chat/>;
+    console.log("details", avatar, username)
+
+    if(username && !avatar){
+        return <Avatar/>
     }
 
-    // if(username && !avatar){
-    //     return <Avatar/>
-    // }
+    if (username) {
+        console.log("user detected", username);
+        return <Chat/>
+    }
 
     return (
         <RegisterAndLoginForm />

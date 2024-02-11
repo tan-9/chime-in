@@ -9,7 +9,7 @@ export default function RegisterAndLoginForm(){
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [isLoggedin, setIsloggedin] = useState('register');
-    const {setUsername:setLoggedInUsername, setId} = useContext(UserContext);
+    const {setUsername:setLoggedInUsername, setId, setAvatar} = useContext(UserContext);
     async function handleResponse(ev){
         ev.preventDefault();
         const url = isLoggedin === 'register' ? 'register' : 'login';
@@ -17,6 +17,9 @@ export default function RegisterAndLoginForm(){
             const{data} = await axios.post(url, {username, password});
             setLoggedInUsername(username);
             setId(data.id);
+            console.log("user data", data);
+            if(url==='login')
+            setAvatar(data.avatar);
         } catch(error){
             if(error.response && error.response.status === 401) {
                 toast.error("Incorrect Password :(");
