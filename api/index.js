@@ -13,9 +13,7 @@ dotenv.config();
 console.log(process.env.MONGO_URL);
 
 const jwtSecret = process.env.JWT_SECRET;
-
 const bcryptSalt = bcrypt.genSaltSync(10);
-
 
 app.use(express.json());
 app.use(cookieParser());
@@ -29,29 +27,6 @@ mongoose.connect(process.env.MONGO_URL);
 app.get('/test', (req, res)=>{
     res.json('test ok');
 });     
-
-// app.get('/profile', (req, res)=>{
-//     const token = req.cookies?.token;
-//     if(token){
-//         jwt.verify(token, jwtSecret, {}, (err, userData)=>{
-//             if(err) throw err;
-//             UserModel.findByIdAndUpdate(userData.userID, { avatar: req.body.avatar }, err => {
-//                 if (err) {
-//                     console.error('Error updating avatar:', err);
-//                     res.status(500).json('server error');
-//                 } else {
-//                     res.json('Avatar updated successfully');
-//                 }
-//             });
-//         });
-//     }
-//     else{
-//         res.status(401).json('no token');
-//     }
-    
-// });
-
-// Your Express server code
 
 app.put('/profile', (req, res) => {
   const token = req.cookies?.token;
@@ -78,7 +53,7 @@ app.put('/profile', (req, res) => {
         }
 
         else{
-          await User.findByIdAndUpdate(userID, { avatar }); // use await here
+          await User.findByIdAndUpdate(userID, { avatar });
           res.json('Avatar updated successfully');
         }
       } catch (err) {
@@ -101,7 +76,7 @@ app.get('/user', (req, res) => {
               return res.status(401).json('Invalid token');
           }
 
-          console.log('User Data: ', userData);
+          // console.log('User Data: ', userData);
 
           const { userID, username, avatar } = userData;
 
@@ -111,8 +86,6 @@ app.get('/user', (req, res) => {
       res.status(401).json('No token');
   }
 });
-
-
 
 app.post('/login', async (req, res)=>{
     const {username, password} = req.body;
@@ -160,9 +133,29 @@ try{
 const server = app.listen(5000);
 const wss = new ws.WebSocketServer({server});
 
-wss.on('connection', (connection)=>{
-  console.log('connected'); 
-  connection.send('hello')
+wss.on('connection', (connection, req)=>{
+  console.log('connected');
+  console.log(req.headers);
+  const cookies  = req.headers.cookie;
+  if(cookies){
+   const cookietokenstr =  cookies.split(';').find(str=>str.startsWith('token=')); //in case of multiple cookies
+  //  console.log(cookietokenstr);
+  if(cookietokenstr){
+    const t = cookietokenstr.split('=')[1];
+
+    if(t){
+      console.log(t);
+      jwt.verify(t, jwtSecret, {}, (err, userData)=>{
+        if(err) throw err;
+        const {userId, username} = userData;
+        connection.userId = userId;
+        connection.username = username;
+      });
+    }
+  }
+}
+  // connection.send('helloo');
+  console.log([...wss.clients].map(c=>c.username));
 });
 
 
