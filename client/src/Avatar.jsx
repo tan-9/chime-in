@@ -17,17 +17,28 @@ export default function AvatarSelection() {
         
     };
 
-    const handleConfirmAvatar = () => {
+    // const handleConfirmAvatar = () => {
+    //     setAvatar(selectedAvatar);
+    //     localStorage.setItem('avatar', selectedAvatar);
+    //     axios.put('/profile', { avatar: selectedAvatar })
+    //     .then(response => {
+    //         console.log('Avatar updated successfully');
+    //     })
+    //     .catch(error => {
+    //         console.error('Error updating avatar:', error);
+    //     });
+    // };
+
+    const handleConfirmAvatar = async () => {
         setAvatar(selectedAvatar);
         localStorage.setItem('avatar', selectedAvatar);
-        axios.put('/profile', { avatar: selectedAvatar })
-        .then(response => {
-            console.log('Avatar updated successfully');
-        })
-        .catch(error => {
+        try {
+            const response = await axios.put('/profile', { avatar: selectedAvatar })
+            console.log('Avatar updated successfully:', response.data);
+        } catch (error) {
             console.error('Error updating avatar:', error);
-        });
-    };
+        }
+    }
 
     return (
         <div className="flex flex-col items-center h-screen py-10 pb-10 bg-slate-300">

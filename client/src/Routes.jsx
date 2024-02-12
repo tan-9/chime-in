@@ -12,9 +12,11 @@ export default function Routes() {
         const storedAvatar = localStorage.getItem('avatar');
         if(storedAvatar){
             setAvatar(storedAvatar);
+            if(username) setLoading(false);
+            else setTimeout(()=>setLoading(false), 1000); //Give the user time to load their profile before showing
         }
-        setLoading(false);
-    }, [setAvatar]);
+        else setLoading(false);
+    }, [username, setAvatar]);
 
     console.log("details", avatar, username)
 
@@ -23,7 +25,7 @@ export default function Routes() {
     }
 
     if(username && !avatar){
-        console.log("details", avatar, username);
+        console.log("details!", avatar, username);
         return <Avatar/>
     }
 
