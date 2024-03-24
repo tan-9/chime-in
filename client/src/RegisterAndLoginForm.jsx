@@ -17,9 +17,9 @@ export default function RegisterAndLoginForm(){
             const{data} = await axios.post(url, {username, password});
             setLoggedInUsername(username);
             setId(data.id);
+            setAvatar(null); 
             console.log("user data", data);
-            if(url==='login')
-            setAvatar(data.avatar);
+            if(url==='login') setAvatar(data.avatar);
         } catch(error){
             if(error.response && error.response.status === 401) {
                 toast.error("Incorrect Password :(");

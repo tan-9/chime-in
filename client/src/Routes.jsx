@@ -29,7 +29,7 @@ export default function Routes() {
         return <Avatar/>
     }
 
-    if (username) {
+    if (username && avatar) {
         console.log("user detected", username);
         return <Chat/>
     }

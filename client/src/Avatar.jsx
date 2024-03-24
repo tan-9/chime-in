@@ -2,32 +2,25 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./userContext";
 import axios from "axios";
 
-export default function AvatarSelection() {
-    const { setAvatar, avatar } = useContext(UserContext);
+export default function Avatar() {
+    const { avatar, setAvatar } = useContext(UserContext);
     const [avatars, setAvatars] = useState([]);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
 
     useEffect(() => {
         const newAvatars = Array.from({length: 4}, () => Math.floor(Math.random() * 10000000).toString());
         setAvatars(newAvatars);
-    }, []);
+
+        if(user && user.avatar){
+            setSelectedAvatar(user.avatar);
+        }
+    }, [user]);
 
     const handleAvatarClick = (avatar) => {
         setSelectedAvatar(avatar);
         
     };
 
-    // const handleConfirmAvatar = () => {
-    //     setAvatar(selectedAvatar);
-    //     localStorage.setItem('avatar', selectedAvatar);
-    //     axios.put('/profile', { avatar: selectedAvatar })
-    //     .then(response => {
-    //         console.log('Avatar updated successfully');
-    //     })
-    //     .catch(error => {
-    //         console.error('Error updating avatar:', error);
-    //     });
-    // };
 
     const handleConfirmAvatar = async () => {
         setAvatar(selectedAvatar);
