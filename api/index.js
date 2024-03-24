@@ -138,8 +138,7 @@ wss.on('connection', (connection, req)=>{
   console.log(req.headers);
   const cookies  = req.headers.cookie;
   if(cookies){
-   const cookietokenstr =  cookies.split(';').find(str=>str.startsWith('token=')); //in case of multiple cookies
-  //  console.log(cookietokenstr);
+   const cookietokenstr = cookies.split(';').find(str=>str.startsWith('token=')); //in case of multiple cookies
   if(cookietokenstr){
     const t = cookietokenstr.split('=')[1];
 
@@ -154,8 +153,17 @@ wss.on('connection', (connection, req)=>{
     }
   }
 }
-  // connection.send('helloo');
-  console.log([...wss.clients].map(c=>c.username));
+  
+  // console.log([...wss.clients].map(c=>({userId:c.userId, username: c.username})));
+
+  const onlineData = [...wss.clients].map(c=>({userId:c.userId, username: c.username}));
+  console.log(JSON.stringify(onlineData));
+
+  [...wss.clients].forEach(client=>{
+    client.send(JSON.stringify({
+      online: [...wss.clients].map(c=>({userId:c.userId, username: c.username}))
+    }));
+  });
 });
 
 
