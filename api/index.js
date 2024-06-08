@@ -41,19 +41,19 @@ app.put('/profile', (req, res) => {
 
       console.log('User Data: ', userData);
 
-      const { userID } = userData;
+      const { userId } = userData;
       const { avatar } = req.body;
 
       console.log('Received avatar:', avatar);
 
       try {
-        const user = await User.findById(userID);
+        const user = await User.findById(userId);
         if(user.avatar){
           return res.status(400).json('avatar is set');
         }
 
         else{
-          await User.findByIdAndUpdate(userID, { avatar });
+          await User.findByIdAndUpdate(userId, { avatar });
           res.json('Avatar updated successfully');
         }
       } catch (err) {
@@ -78,9 +78,9 @@ app.get('/user', (req, res) => {
 
           // console.log('User Data: ', userData);
 
-          const { userID, username, avatar } = userData;
+          const { userId, username, avatar } = userData;
 
-          res.json({ userID, username, avatar });
+          res.json({ userId, username, avatar });
       });
   } else {
       res.status(401).json('No token');
@@ -94,7 +94,7 @@ app.post('/login', async (req, res)=>{
     if(foundUser){
        const passOk = bcrypt.compareSync(password, foundUser.password); //compares plain text passwords with hashed passwords
        if(passOk){
-        jwt.sign({userID:foundUser._id,username}, jwtSecret, {}, (err, token)=>{
+        jwt.sign({userId:foundUser._id,username}, jwtSecret, {}, (err, token)=>{
             res.cookie('token', token, {sameSite:'none', secure:true}).json({
                 id: foundUser._id, avatar: foundUser.avatar,
             });
@@ -117,7 +117,7 @@ app.post('/register', async (req, res)=>{
 try{
     const hashedPwd = bcrypt.hashSync(password, bcryptSalt);
     const createdUser = await User.create({username: username, password: hashedPwd, avatar: avatar});
-    jwt.sign({userID:createdUser._id,username}, jwtSecret, {}, (err, token)=>{
+    jwt.sign({userId:createdUser._id,username}, jwtSecret, {}, (err, token)=>{
         if(err) throw err;
         res.cookie('token', token, {sameSite:'none', secure:true}).status(201).json({
             id: createdUser._id,
@@ -135,7 +135,6 @@ const wss = new ws.WebSocketServer({server});
 
 wss.on('connection', (connection, req)=>{
   console.log('connected');
-  console.log(req.headers);
   const cookies  = req.headers.cookie;
   if(cookies){
    const cookietokenstr = cookies.split(';').find(str=>str.startsWith('token=')); //in case of multiple cookies
@@ -146,6 +145,7 @@ wss.on('connection', (connection, req)=>{
       console.log(t);
       jwt.verify(t, jwtSecret, {}, (err, userData)=>{
         if(err) throw err;
+        console.log(userData);
         const {userId, username} = userData;
         connection.userId = userId;
         connection.username = username;
@@ -154,16 +154,13 @@ wss.on('connection', (connection, req)=>{
   }
 }
   
-  // console.log([...wss.clients].map(c=>({userId:c.userId, username: c.username})));
-
-  const onlineData = [...wss.clients].map(c=>({userId:c.userId, username: c.username}));
-  console.log(JSON.stringify(onlineData));
 
   [...wss.clients].forEach(client=>{
     client.send(JSON.stringify({
       online: [...wss.clients].map(c=>({userId:c.userId, username: c.username}))
     }));
   });
+
 });
 
 
