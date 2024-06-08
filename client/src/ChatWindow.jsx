@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function ChatWindow(){
     const [ws, setWs] = useState(null); 
+    const [onlinePeople, setOnlinePeople] = useState({});
     useEffect(()=>{
         const ws = new WebSocket('ws://localhost:5000');
         // const ws = new WebSocket("ws://" + location.host + "/");
@@ -9,13 +10,31 @@ export default function ChatWindow(){
         ws.addEventListener('message', handleMessage);
     }, []);
 
+    function showOnlinePeople(pArray){
+        const people = {};
+        pArray.forEach(({userId, username}) => {
+            people[userId] = username;
+        });
+        setOnlinePeople(people);
+        console.log(people);
+    }
+
     function handleMessage(ev){
-        console.log(ev.data);
+        const messageData = JSON.parse(ev.data);
+        if('online' in messageData){
+            showOnlinePeople(messageData.online);
+        }
+
     }
     return (
         <div className="flex h-screen">
-            <div className="bg-pink-200 w-1/4">
-                contacts
+            <div className="bg-pink-200 w-1/4 p-2">
+                <div className="text-pink-600 font-bold">ChimeIn!</div>
+                {Object.keys(onlinePeople).map(userId => (
+                    <div className="border-b border-white-400 py-2">
+                        {onlinePeople[userId]}
+                    </div>
+                ))}
             </div>
 
             <div className="flex flex-col bg-white w-3/4">
