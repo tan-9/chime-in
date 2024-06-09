@@ -9,7 +9,7 @@ export function UserContextProvider({children}){
 
     useEffect(()=>{
         axios.get('/profile').then(response=>{
-            setId(response.data.userID);
+            setId(response.data.userId);
             setUsername(response.data.username);
             setAvatar(response.data.avatar);
         });
@@ -17,7 +17,7 @@ export function UserContextProvider({children}){
 
     useEffect(() => {
         axios.get('/user').then(response => {
-            setId(response.data.userID);
+            setId(response.data.userId);
             setUsername(response.data.username);
             setAvatar(response.data?.avatar);
         });
