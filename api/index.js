@@ -153,6 +153,10 @@ wss.on('connection', (connection, req)=>{
     }
   }
 }
+
+  connection.on('message', (message) =>{
+    console.log("the msg:", message);
+  });
   
 
   [...wss.clients].forEach(client=>{
