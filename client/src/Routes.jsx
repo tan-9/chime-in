@@ -24,7 +24,7 @@ export default function Routes() {
         return <div>Loading...</div>
     }
 
-    if(username && !avatar){
+    if(!avatar){
         console.log("details!", avatar, username);
         return <Avatar/>
     }

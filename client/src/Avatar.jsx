@@ -10,17 +10,12 @@ export default function Avatar() {
     useEffect(() => {
         const newAvatars = Array.from({length: 4}, () => Math.floor(Math.random() * 10000000).toString());
         setAvatars(newAvatars);
-
-        if(user && user.avatar){
-            setSelectedAvatar(user.avatar);
-        }
-    }, [user]);
+    }, []);
 
     const handleAvatarClick = (avatar) => {
         setSelectedAvatar(avatar);
         
     };
-
 
     const handleConfirmAvatar = async () => {
         setAvatar(selectedAvatar);
