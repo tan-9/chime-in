@@ -7,6 +7,7 @@ export default function ChatWindow(){
     const [selectedUserId, setSelectedUserId] = useState(null);
     const {username, id} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
+    const [receivedmsg, setReceivedmsg] = useState([]);
 
     useEffect(()=>{
         const ws = new WebSocket('ws://localhost:5000');
@@ -28,17 +29,21 @@ export default function ChatWindow(){
         if('online' in messageData){
             showOnlinePeople(messageData.online);
         }
+        else{
+            setReceivedmsg(prev => ([...prev, {isOur:false, text:messageData.text}]));
+        }
     }
 
     function sendMsg(ev){
         ev.preventDefault();
         console.log('sending msg');
         ws.send(JSON.stringify({
-            message:{
-                recipient: selectedUserId,
-                text: msgtxt,
-            }
+            recipient: selectedUserId,
+            text: msgtxt,
+            
         }));
+        setMsgtxt('');
+        setReceivedmsg(prev => ([...prev, {text: msgtxt, isOurs: true}]))
     }
 
     const otherContacts = {...onlinePeople};
@@ -67,6 +72,14 @@ export default function ChatWindow(){
 
                     }
                 </div>
+
+                {!!selectedUserId && (
+                    <div>
+                        {receivedmsg.map(msg=>(
+                            <div>{msg.text}</div>
+                        ))}
+                    </div>
+                )}
 
                 {!!selectedUserId && (
                     <form className="flex gap-2 mx-1" onSubmit={sendMsg}>
