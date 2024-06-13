@@ -65,13 +65,13 @@ export default function ChatWindow(){
             
                 {Object.keys(otherContacts).map(userId => (
                     <div key={userId} onClick={()=>setSelectedUserId(userId)} 
-                        className={"border-b border-white-400 py-3 px-3 cursor-pointer " + (userId === selectedUserId ? "bg-green-100" : "")}>
+                        className={"border-b border-white-400 py-3 px-3 cursor-pointer" + (userId === selectedUserId ? "bg-green-100" : "")}>
                         {otherContacts[userId]}
                     </div>
                 ))}
             </div>
 
-            <div className="flex flex-col bg-white w-3/4">
+            <div className="flex flex-col bg-white w-3/4 p-2">
                 <div className="flex-grow">
                     {!selectedUserId && (
                         <div className="flex flex-grow h-full items-center justify-center">
