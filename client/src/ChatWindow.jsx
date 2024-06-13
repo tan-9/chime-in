@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./userContext";
+import { uniqBy } from "lodash"
+
 
 export default function ChatWindow(){
     const [ws, setWs] = useState(null); 
@@ -26,11 +28,12 @@ export default function ChatWindow(){
 
     function handleMessage(ev){
         const messageData = JSON.parse(ev.data);
+        console.log({ev, messageData});
         if('online' in messageData){
             showOnlinePeople(messageData.online);
         }
         else{
-            setReceivedmsg(prev => ([...prev, {isOur:false, text:messageData.text}]));
+            setReceivedmsg(prev => ([...prev, {...messageData}]));
         }
     }
 
@@ -43,11 +46,17 @@ export default function ChatWindow(){
             
         }));
         setMsgtxt('');
-        setReceivedmsg(prev => ([...prev, {text: msgtxt, isOurs: true}]))
+        setReceivedmsg(prev => ([...prev, {
+            text: msgtxt, 
+            sender: id,
+            recipient: selectedUserId
+        }]));
     }
 
     const otherContacts = {...onlinePeople};
     delete otherContacts[id];
+
+    const messagesWithoutDup = uniqBy(receivedmsg, 'id');
 
     return (
         <div className="flex h-screen">
@@ -75,8 +84,12 @@ export default function ChatWindow(){
 
                 {!!selectedUserId && (
                     <div>
-                        {receivedmsg.map(msg=>(
-                            <div>{msg.text}</div>
+                        {messagesWithoutDup.map(msg=>(
+                            <div>
+                                sender: {msg.sender}<br/>
+                                my id: {id}<br/>
+                                {msg.text}
+                            </div>
                         ))}
                     </div>
                 )}
