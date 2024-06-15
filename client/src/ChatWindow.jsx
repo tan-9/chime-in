@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import { UserContext } from "./userContext";
 import { uniqBy } from "lodash"
+import axios from "axios";
 
 
 export default function ChatWindow(){
@@ -61,6 +62,12 @@ export default function ChatWindow(){
             div.scrollIntoView({behaviour: 'smooth', block:'end'});
         }
     }, [receivedmsg])
+
+    useEffect(()=>{
+        if(selectedUserId){
+            axios.get('/messages/'+selectedUserId) //this endpoint will receive msgs between our user and selected user
+        }
+    }, [selectedUserId]);
 
     const otherContacts = {...onlinePeople};
     delete otherContacts[id];
