@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { UserContext } from "./userContext";
 import { uniqBy } from "lodash"
 
@@ -10,6 +10,7 @@ export default function ChatWindow(){
     const {username, id} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
     const [receivedmsg, setReceivedmsg] = useState([]);
+    const divUndermsg = useRef();
 
     useEffect(()=>{
         const ws = new WebSocket('ws://localhost:5000');
@@ -49,13 +50,21 @@ export default function ChatWindow(){
         setReceivedmsg(prev => ([...prev, {
             text: msgtxt, 
             sender: id,
-            recipient: selectedUserId
+            recipient: selectedUserId,
+            id: Date.now(),
         }]));
     }
 
+    useEffect(() => {
+        const div = divUndermsg.current;
+        if(div){
+            div.scrollIntoView({behaviour: 'smooth', block:'end'});
+        }
+    }, [receivedmsg])
+
     const otherContacts = {...onlinePeople};
     delete otherContacts[id];
-
+ 
     const messagesWithoutDup = uniqBy(receivedmsg, 'id');
 
     return (
@@ -64,14 +73,15 @@ export default function ChatWindow(){
                 <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
             
                 {Object.keys(otherContacts).map(userId => (
-                    <div key={userId} onClick={()=>setSelectedUserId(userId)} 
-                        className={"border-b border-white-400 py-3 px-3 cursor-pointer" + (userId === selectedUserId ? "bg-green-100" : "")}>
+                    <div 
+                    key={userId} onClick={()=>setSelectedUserId(userId)} 
+                        className={"border-b border-white-400 py-3 px-3 cursor-pointer " + (userId === selectedUserId ? "bg-blue-200" : "")}>
                         {otherContacts[userId]}
                     </div>
                 ))}
             </div>
 
-            <div className="flex flex-col bg-white w-3/4 p-2">
+            <div className="flex flex-col bg-white w-3/4">
                 <div className="flex-grow">
                     {!selectedUserId && (
                         <div className="flex flex-grow h-full items-center justify-center">
@@ -83,14 +93,19 @@ export default function ChatWindow(){
                 </div>
 
                 {!!selectedUserId && (
-                    <div>
+                    <div className="relative h-full">
+                        <div className="overflow-y-scroll absolute inset-0">
                         {messagesWithoutDup.map(msg=>(
-                            <div>
+                            <div className={(msg.sender === id ? 'text-right' : 'text-left')}>
+                                <div className={"text-left text-sm inline-block p-2 m-2 rounded-md " +(msg.sender === id ? 'bg-pink-300 text-black' : 'bg-blue-300 text-white')}>
                                 sender: {msg.sender}<br/>
                                 my id: {id}<br/>
                                 {msg.text}
+                                </div>
                             </div>
                         ))}
+                        <div ref={divUndermsg}></div>
+                        </div>
                     </div>
                 )}
 
