@@ -109,8 +109,9 @@ app.get('/user', (req, res) => {
 app.get('/messages/:userId', async (req, res)=>{
   // res.json(req.params);
   const {userId} = req.params;
-  const userData = getUserDatafromReq(req);
+  const userData = await getUserDatafromReq(req);
   const ourUserId = userData.userId
+  console.log({userId, ourUserId});
   const messages = await Message.find({
     sender:{$in:[userId, ourUserId]},
     recipient:{$in:[userId, ourUserId]},
@@ -174,10 +175,10 @@ wss.on('connection', (connection, req)=>{
     const t = cookietokenstr.split('=')[1];
 
     if(t){
-      console.log(t);
+      // console.log(t);
       jwt.verify(t, jwtSecret, {}, (err, userData)=>{
         if(err) throw err;
-        console.log(userData);
+        // console.log(userData);
         const {userId, username} = userData;
         connection.userId = userId;
         connection.username = username;
