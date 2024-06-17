@@ -52,7 +52,7 @@ export default function ChatWindow(){
             text: msgtxt, 
             sender: id,
             recipient: selectedUserId,
-            id: Date.now(),
+            _id: Date.now(),
         }]));
     }
 
@@ -65,14 +65,16 @@ export default function ChatWindow(){
 
     useEffect(()=>{
         if(selectedUserId){
-            axios.get('/messages/'+selectedUserId) //this endpoint will receive msgs between our user and selected user
+            axios.get('/messages/'+selectedUserId).then(res => {
+                setReceivedmsg(res.data.reverse());
+            }) //this endpoint will receive msgs between our user and selected user
         }
     }, [selectedUserId]);
 
     const otherContacts = {...onlinePeople};
     delete otherContacts[id];
  
-    const messagesWithoutDup = uniqBy(receivedmsg, 'id');
+    const messagesWithoutDup = uniqBy(receivedmsg, '_id');
 
     return (
         <div className="flex h-screen">
@@ -103,10 +105,8 @@ export default function ChatWindow(){
                     <div className="relative h-full">
                         <div className="overflow-y-scroll absolute inset-0">
                         {messagesWithoutDup.map(msg=>(
-                            <div className={(msg.sender === id ? 'text-right' : 'text-left')}>
+                            <div key={msg._id} className={(msg.sender === id ? 'text-right' : 'text-left')}>
                                 <div className={"text-left text-sm inline-block p-2 m-2 rounded-md " +(msg.sender === id ? 'bg-pink-300 text-black' : 'bg-blue-300 text-white')}>
-                                sender: {msg.sender}<br/>
-                                my id: {id}<br/>
                                 {msg.text}
                                 </div>
                             </div>
