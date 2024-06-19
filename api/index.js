@@ -45,7 +45,28 @@ async function getUserDatafromReq(req){
 
 app.get('/test', (req, res)=>{
     res.json('test ok');
-});     
+});  
+
+
+app.get('/messages/:userId', async (req, res)=>{
+  // res.json(req.params);
+  const {userId} = req.params;
+  const userData = await getUserDatafromReq(req);
+  const ourUserId = userData.userId
+  console.log({userId, ourUserId});
+  const messages = await Message.find({
+    sender:{$in:[userId, ourUserId]},
+    recipient:{$in:[userId, ourUserId]},
+  }).sort({createdAt: 1});
+
+  res.json(messages);
+});
+
+app.get('/people', async(req, res)=>{
+  const users = await User.find({}, {'_id':1,username:1});
+  res.json(users);
+});
+
 
 app.put('/profile', (req, res) => {
   const token = req.cookies?.token;
@@ -104,20 +125,6 @@ app.get('/user', (req, res) => {
   } else {
       res.status(401).json('No token');
   }
-});
-
-app.get('/messages/:userId', async (req, res)=>{
-  // res.json(req.params);
-  const {userId} = req.params;
-  const userData = await getUserDatafromReq(req);
-  const ourUserId = userData.userId
-  console.log({userId, ourUserId});
-  const messages = await Message.find({
-    sender:{$in:[userId, ourUserId]},
-    recipient:{$in:[userId, ourUserId]},
-  }).sort({createdAt: 1});
-
-  res.json(messages);
 });
 
 app.post('/login', async (req, res)=>{
