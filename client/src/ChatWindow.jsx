@@ -2,11 +2,13 @@ import { useContext, useEffect, useState, useRef } from "react";
 import { UserContext } from "./userContext";
 import { uniqBy } from "lodash"
 import axios from "axios";
+import Contact from "./Contact"
 
 
 export default function ChatWindow(){
     const [ws, setWs] = useState(null); 
     const [onlinePeople, setOnlinePeople] = useState({});
+    const [offlinePeople, setOfflinePeople] = useState({});
     const [selectedUserId, setSelectedUserId] = useState(null);
     const {username, id} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
@@ -25,7 +27,7 @@ export default function ChatWindow(){
             people[userId] = username;
         });
         setOnlinePeople(people);
-        console.log(people);
+        // console.log(people);
     }
 
     function handleMessage(ev){
@@ -56,6 +58,20 @@ export default function ChatWindow(){
         }]));
     }
 
+    useEffect(()=>{
+        axios.get('/people').then(res=>{
+           const offlinePeopleArr = res.data
+           .filter(p=>p._id!==id)
+           .filter(p=> !Object.keys(onlinePeople).includes(p._id));
+
+           const offlinePeople = {};
+           offlinePeopleArr.forEach(p=>{
+            offlinePeople[p._id] = p;
+           })
+           setOfflinePeople(offlinePeople);
+        })
+    }, [onlinePeople])
+
     useEffect(() => {
         const div = divUndermsg.current;
         if(div){
@@ -66,7 +82,7 @@ export default function ChatWindow(){
     useEffect(()=>{
         if(selectedUserId){
             axios.get('/messages/'+selectedUserId).then(res => {
-                setReceivedmsg(res.data.reverse());
+                setReceivedmsg(res.data);
             }) //this endpoint will receive msgs between our user and selected user
         }
     }, [selectedUserId]);
@@ -80,13 +96,12 @@ export default function ChatWindow(){
         <div className="flex h-screen">
             <div className="bg-pink-200 w-1/4">
                 <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
-            
                 {Object.keys(otherContacts).map(userId => (
-                    <div 
-                    key={userId} onClick={()=>setSelectedUserId(userId)} 
-                        className={"border-b border-white-400 py-3 px-3 cursor-pointer " + (userId === selectedUserId ? "bg-blue-200" : "")}>
-                        {otherContacts[userId]}
-                    </div>
+                    <Contact key={userId} id={userId} username={otherContacts[userId]} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
+                ))}
+
+                {Object.keys(offlinePeople).map(userId => (
+                    <Contact key={userId} id={userId} username={offlinePeople[userId].username} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
                 ))}
             </div>
 
