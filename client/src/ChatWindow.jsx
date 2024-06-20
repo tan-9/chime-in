@@ -93,7 +93,7 @@ export default function ChatWindow(){
     const messagesWithoutDup = uniqBy(receivedmsg, '_id');
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-full">
             <div className="bg-pink-200 w-1/4">
                 <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
                 {Object.keys(otherContacts).map(userId => (
