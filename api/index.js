@@ -36,7 +36,7 @@ async function getUserDatafromReq(req){
     });
   }
   else{
-    reject('no token')
+    reject('no token');
   }
 
   });
@@ -47,12 +47,10 @@ app.get('/test', (req, res)=>{
     res.json('test ok');
 });  
 
-
 app.get('/messages/:userId', async (req, res)=>{
-  // res.json(req.params);
   const {userId} = req.params;
   const userData = await getUserDatafromReq(req);
-  const ourUserId = userData.userId
+  const ourUserId = userData.userId;
   console.log({userId, ourUserId});
   const messages = await Message.find({
     sender:{$in:[userId, ourUserId]},
@@ -63,7 +61,7 @@ app.get('/messages/:userId', async (req, res)=>{
 });
 
 app.get('/people', async(req, res)=>{
-  const users = await User.find({}, {'_id':1,username:1});
+  const users = await User.find({}, {'_id':1,username:1,avatar:1});
   res.json(users);
 });
 
@@ -73,7 +71,7 @@ app.put('/profile', (req, res) => {
   console.log(token);
   
   if (token) {
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => { // add async here
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
       if (err) {
         console.error('Error verifying token:', err);
         return res.status(401).json('Invalid token');
@@ -83,7 +81,7 @@ app.put('/profile', (req, res) => {
 
       const { userId } = userData;
       const { avatar } = req.body;
-
+      console.log(userId);
       console.log('Received avatar:', avatar);
 
       try {
@@ -134,7 +132,7 @@ app.post('/login', async (req, res)=>{
     if(foundUser){
        const passOk = bcrypt.compareSync(password, foundUser.password); //compares plain text passwords with hashed passwords
        if(passOk){
-        jwt.sign({userId:foundUser._id,username}, jwtSecret, {}, (err, token)=>{
+        jwt.sign({userId:foundUser._id,username, avatar:foundUser.avatar}, jwtSecret, {}, (err, token)=>{
             res.cookie('token', token, {sameSite:'none', secure:true}).json({
                 id: foundUser._id, avatar: foundUser.avatar,
             });
