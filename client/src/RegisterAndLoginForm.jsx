@@ -20,6 +20,9 @@ export default function RegisterAndLoginForm(){
             setAvatar(null); 
             console.log("user data", data);
             if(url==='login') setAvatar(data.avatar);
+            if(url==='register') {
+                localStorage.removeItem('avatar');
+            }
         } catch(error){
             if(error.response && error.response.status === 401) {
                 toast.error("Incorrect Password :(");

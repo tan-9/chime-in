@@ -8,8 +8,13 @@ export default function Avatar() {
     const [selectedAvatar, setSelectedAvatar] = useState(null);
 
     useEffect(() => {
-        const newAvatars = Array.from({length: 4}, () => Math.floor(Math.random() * 10000000).toString());
-        setAvatars(newAvatars);
+        const storedAvatar = localStorage.getItem('avatar');
+        if(storedAvatar){
+            setAvatar(storedAvatar);
+        } else{
+            const newAvatars = Array.from({length: 4}, () => Math.floor(Math.random() * 10000000).toString());
+            setAvatars(newAvatars);
+        }
     }, []);
 
     const handleAvatarClick = (avatar) => {
