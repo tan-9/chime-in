@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./userContext";
 import Chat from "./ChatWindow";
 import Avatar from "./Avatar";
+import Loading from "./Loading";
 
 export default function Routes() {
     const { username, id, avatar, setAvatar } = useContext(UserContext);
@@ -21,7 +22,7 @@ export default function Routes() {
     console.log("details", avatar, username)
 
     if(loading){
-        return <div>Loading...</div>
+        return <Loading/>
     }
 
     if(!avatar){
