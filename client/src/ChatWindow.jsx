@@ -10,7 +10,7 @@ export default function ChatWindow(){
     const [onlinePeople, setOnlinePeople] = useState({});
     const [offlinePeople, setOfflinePeople] = useState({});
     const [selectedUserId, setSelectedUserId] = useState(null);
-    const {username, id, setUsername, setId} = useContext(UserContext); 
+    const {username, id, avatar, setUsername, setId, setAvatar} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
     const [receivedmsg, setReceivedmsg] = useState([]);
     const divUndermsg = useRef();
@@ -23,11 +23,12 @@ export default function ChatWindow(){
 
     function showOnlinePeople(pArray){
         const people = {};
-        pArray.forEach(({userId, username}) => {
-            people[userId] = username;
+        pArray.forEach(({userId, username, avatar}) => {
+            const userAvatar = avatar;
+            people[userId] = {username, avatar: userAvatar};
         });
         setOnlinePeople(people);
-        // console.log(people);
+        console.log("Chat window:",people);
     }
 
     function handleMessage(ev){
@@ -106,6 +107,7 @@ export default function ChatWindow(){
                 <div className="flex-grow">
                     <div>{username}</div>
                     <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
+
                     {Object.keys(otherContacts).map(userId => (
                         <Contact key={userId} id={userId} username={otherContacts[userId]} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
                     ))}

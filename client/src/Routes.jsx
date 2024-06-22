@@ -16,11 +16,13 @@ export default function Routes() {
                 const res = await axios.get('/profile');
                 const storedAvatar = res.data.avatar;
 
+                console.log("this is the stored avatar id:", storedAvatar);
+
                 if(storedAvatar){
                     setAvatar(storedAvatar);
                 }
             } catch(error){
-                console.error("Error fetching avatar status:", error)
+                console.error("Error fetching avatar status:", error);
             } finally{
                 setLoading(false);
             }
@@ -38,7 +40,7 @@ export default function Routes() {
         // };
     }, [setAvatar]);
 
-    console.log("details", avatar, username)
+    console.log("details", avatar, username);
 
     if(loading){
         return <Loading/>
