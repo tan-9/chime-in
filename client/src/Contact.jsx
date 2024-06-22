@@ -6,7 +6,10 @@ export default function Contact({id, username, onClick, selected}){
             {selected && (
                 <div className="w-1 bg-blue-500"></div>
             )}
-            <span className="text-gray-800">{username}</span>
+            <span className="text-gray-800">
+                
+                {username}
+            </span>
         </div>
 
     );
