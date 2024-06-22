@@ -10,7 +10,7 @@ export default function ChatWindow(){
     const [onlinePeople, setOnlinePeople] = useState({});
     const [offlinePeople, setOfflinePeople] = useState({});
     const [selectedUserId, setSelectedUserId] = useState(null);
-    const {username, id} = useContext(UserContext); 
+    const {username, id, setUsername, setId} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
     const [receivedmsg, setReceivedmsg] = useState([]);
     const divUndermsg = useRef();
@@ -58,6 +58,14 @@ export default function ChatWindow(){
         }]));
     }
 
+    function logout(){
+        axios.post('/logout').then(()=>{
+            setWs(null);
+            setId(null);
+            setUsername(null);
+        })
+    }
+
     useEffect(()=>{
         axios.get('/people').then(res=>{
            const offlinePeopleArr = res.data
@@ -93,16 +101,24 @@ export default function ChatWindow(){
     const messagesWithoutDup = uniqBy(receivedmsg, '_id');
 
     return (
-        <div className="flex h-full">
-            <div className="bg-pink-200 w-1/4">
-                <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
-                {Object.keys(otherContacts).map(userId => (
-                    <Contact key={userId} id={userId} username={otherContacts[userId]} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
-                ))}
+        <div className="flex h-screen">
+            <div className="bg-pink-200 w-1/4 flex flex-col">
+                <div className="flex-grow">
+                    <div>{username}</div>
+                    <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
+                    {Object.keys(otherContacts).map(userId => (
+                        <Contact key={userId} id={userId} username={otherContacts[userId]} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
+                    ))}
 
-                {Object.keys(offlinePeople).map(userId => (
-                    <Contact key={userId} id={userId} username={offlinePeople[userId].username} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
-                ))}
+                    {Object.keys(offlinePeople).map(userId => (
+                        <Contact key={userId} id={userId} username={offlinePeople[userId].username} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
+                    ))}
+                </div>
+                <div className="flex items-center justify-center">
+                    <button 
+                    onClick={logout}
+                    className="text-sm bg-white p-2 rounded-md m-2">LOGOUT</button>
+                </div>
             </div>
 
             <div className="flex flex-col bg-white w-3/4">
