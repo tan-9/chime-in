@@ -4,20 +4,39 @@ import { UserContext } from "./userContext";
 import Chat from "./ChatWindow";
 import Avatar from "./Avatar";
 import Loading from "./Loading";
+import axios from "axios";
 
 export default function Routes() {
     const { username, id, avatar, setAvatar } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
 
     useEffect(()=>{
-        const storedAvatar = localStorage.getItem('avatar');
-        if(storedAvatar){
-            setAvatar(storedAvatar);
-            if(username) setLoading(false);
-            else setTimeout(()=>setLoading(false), 1000); //Give the user time to load their profile before showing
-        }
-        else setLoading(false);
-    }, [username, setAvatar]);
+        const fetchAvatarstatus = async () => {
+            try{
+                const res = await axios.get('/profile');
+                const storedAvatar = res.data.avatar;
+
+                if(storedAvatar){
+                    setAvatar(storedAvatar);
+                }
+            } catch(error){
+                console.error("Error fetching avatar status:", error)
+            } finally{
+                setLoading(false);
+            }
+        };
+        fetchAvatarstatus();
+        // const storedAvatar = localStorage.getItem('avatar');
+        // if(storedAvatar){
+        //     console.log("avatar of user:",storedAvatar);
+        //     setTimeout(()=>setLoading(false), 1000);
+        //     setAvatar(storedAvatar);
+        // }
+        // else{
+        //     setLoading(false);
+        //     return <Avatar/>
+        // };
+    }, [setAvatar]);
 
     console.log("details", avatar, username)
 
@@ -25,7 +44,7 @@ export default function Routes() {
         return <Loading/>
     }
 
-    if(!avatar){
+    if(avatar==null){
         console.log("details!", avatar, username);
         return <Avatar/>
     }
