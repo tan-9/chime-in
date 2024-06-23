@@ -4,7 +4,6 @@ import { uniqBy } from "lodash"
 import axios from "axios";
 import Contact from "./Contact"
 
-
 export default function ChatWindow(){
     const [ws, setWs] = useState(null); 
     const [onlinePeople, setOnlinePeople] = useState({});
@@ -13,6 +12,8 @@ export default function ChatWindow(){
     const {username, id, avatar, setUsername, setId, setAvatar} = useContext(UserContext); 
     const [msgtxt, setMsgtxt] = useState('');
     const [receivedmsg, setReceivedmsg] = useState([]);
+    const [avatarData, setAvatarData] = useState({});
+    const [userList, setUserList] = useState([]);
     const divUndermsg = useRef();
 
     useEffect(()=>{
@@ -23,12 +24,10 @@ export default function ChatWindow(){
 
     function showOnlinePeople(pArray){
         const people = {};
-        pArray.forEach(({userId, username, avatar}) => {
-            const userAvatar = avatar;
-            people[userId] = {username, avatar: userAvatar};
+        pArray.forEach(({userId, username}) => {
+            people[userId] = username;
         });
         setOnlinePeople(people);
-        console.log("Chat window:",people);
     }
 
     function handleMessage(ev){
@@ -69,6 +68,7 @@ export default function ChatWindow(){
 
     useEffect(()=>{
         axios.get('/people').then(res=>{
+            console.log(res.data);
            const offlinePeopleArr = res.data
            .filter(p=>p._id!==id)
            .filter(p=> !Object.keys(onlinePeople).includes(p._id));
@@ -76,8 +76,23 @@ export default function ChatWindow(){
            const offlinePeople = {};
            offlinePeopleArr.forEach(p=>{
             offlinePeople[p._id] = p;
-           })
+           });
            setOfflinePeople(offlinePeople);
+           console.log(offlinePeople);
+
+           const avatarData = {};
+           res.data.forEach(user=>{
+            avatarData[user._id] = user.avatar;
+           });
+
+           const combinedData = offlinePeopleArr.map((user) => ({
+            id: user._id,
+            username: user.username,
+            avatar: avatarData[user._id],
+           }));
+
+           setUserList(combinedData);
+           setAvatar(avatarData);
         })
     }, [onlinePeople])
 
@@ -107,14 +122,28 @@ export default function ChatWindow(){
                 <div className="flex-grow">
                     <div>{username}</div>
                     <div className="text-pink-600 font-bold p-4">ChimeIn!</div>
+                    
+                    <div>
+                        {userList.map((user) => (
+                            <Contact
+                                key={user.id}
+                                avatar={user.avatar}
+                                id={user.id}
+                                username={user.username}
+                                onClick={()=>setSelectedUserId(user.id)}
+                                selected={user.id === selectedUserId}
+                            
+                            />
+                        ))}
+                    </div>
 
-                    {Object.keys(otherContacts).map(userId => (
-                        <Contact key={userId} id={userId} username={otherContacts[userId]} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
+                    {/* {Object.keys(otherContacts).map(user => (
+                        <Contact key={user.id} avatar={user.avatar} id={user.id} username={user.username} onClick={()=>setSelectedUserId(user.id)} selected={user.id===selectedUserId} />
                     ))}
 
                     {Object.keys(offlinePeople).map(userId => (
-                        <Contact key={userId} id={userId} username={offlinePeople[userId].username} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
-                    ))}
+                        <Contact key={userId} id={userId} avatar={avatarData[userId]} username={offlinePeople[userId].username} onClick={()=>setSelectedUserId(userId)} selected={userId===selectedUserId} />
+                    ))} */}
                 </div>
                 <div className="flex items-center justify-center">
                     <button 
