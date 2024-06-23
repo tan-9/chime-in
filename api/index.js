@@ -65,10 +65,9 @@ app.get('/people', async(req, res)=>{
   res.json(users);
 });
 
-
 app.put('/profile', (req, res) => {
   const token = req.cookies?.token;
-  console.log(token);
+  console.log("token:",token);
   
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -77,7 +76,7 @@ app.put('/profile', (req, res) => {
         return res.status(401).json('Invalid token');
       }
 
-      console.log('User Data: ', userData);
+      console.log('User Data after token: ', userData);
 
       const { userId } = userData;
       const { avatar } = req.body;
@@ -202,7 +201,6 @@ wss.on('connection', (connection, req)=>{
     clearTimeout(connection.deathTimer)
   });
 
-  console.log('connected');
   const cookies  = req.headers.cookie;
   if(cookies){
    const cookietokenstr = cookies.split(';').find(str=>str.startsWith('token=')); //in case of multiple cookies
