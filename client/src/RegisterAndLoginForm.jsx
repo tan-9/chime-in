@@ -19,7 +19,10 @@ export default function RegisterAndLoginForm(){
             setId(data.id);
             setAvatar(null); 
             console.log("user data", data);
-            if(url==='login') setAvatar(data.avatar);
+            if(url==='login'){
+                setAvatar(data.avatar);
+                localStorage.removeItem('avatar');
+            }
             if(url==='register') {
                 localStorage.removeItem('avatar');
             }
